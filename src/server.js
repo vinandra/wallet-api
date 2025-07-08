@@ -4,10 +4,14 @@ import { initDB } from "./config/db.js";
 import ratelimiter from "./middleware/rateLimiter.js";
 
 import transactionRoute from "./routes/transactionRaute.js";
+import job from "./config/cron.js";
 
 dotenv.config();
 
 const app = express();
+
+if (process.env.NODE_ENV === "production") job.start();
+
 app.use(ratelimiter);
 app.use(express.json());
 // app.use((req, res, next) => {
@@ -15,6 +19,12 @@ app.use(express.json());
 //   next();
 // });
 const PORT = process.env.PORT || 5001;
+
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+  });
+});
 
 app.get("/", (req, res) => {
   res.send("sakupintar API");
